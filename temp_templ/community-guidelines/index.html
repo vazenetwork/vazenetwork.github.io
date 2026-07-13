@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Community Guidelines</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#f4f6f8;
+    color:#222;
+    line-height:1.7;
+}
+
+header{
+    background:#1976d2;
+    color:white;
+    padding:30px 20px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+
+header h1{
+    font-size:2rem;
+}
+
+header p{
+    margin-top:8px;
+    opacity:.9;
+}
+
+.container{
+    max-width:900px;
+    margin:30px auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    border-radius:14px;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+    overflow:hidden;
+}
+
+.toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 20px;
+    background:#fafafa;
+    border-bottom:1px solid #ddd;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+button{
+    border:none;
+    background:#1976d2;
+    color:white;
+    padding:10px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:15px;
+}
+
+button:hover{
+    background:#1565c0;
+}
+
+.status{
+    font-size:14px;
+    color:#666;
+}
+
+pre{
+    white-space:pre-wrap;
+    word-wrap:break-word;
+    padding:25px;
+    font-size:17px;
+    line-height:1.8;
+    overflow-x:auto;
+    min-height:250px;
+}
+
+.loading{
+    color:#1976d2;
+}
+
+.error{
+    color:#d32f2f;
+}
+
+footer{
+    text-align:center;
+    color:#777;
+    margin:30px;
+    font-size:14px;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+<h1>Community Guidelines</h1>
+<p>Please read the latest guidelines below.</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<div class="toolbar">
+<div class="status" id="status">Loading...</div>
+
+<div>
+<button onclick="loadText()">Refresh</button>
+<button onclick="copyText()">Copy</button>
+</div>
+</div>
+
+<pre id="content" class="loading">Loading community guidelines...</pre>
+
+</div>
+
+</div>
+
+<footer>
+Loaded from <code>./raw.txt</code>
+</footer>
+
+<script>
+
+const RAW_URL = "./raw.txt";
+
+async function loadText(){
+
+    const status = document.getElementById("status");
+    const content = document.getElementById("content");
+
+    status.textContent = "Loading...";
+    content.className = "loading";
+    content.textContent = "Loading community guidelines...";
+
+    try{
+
+        const response = await fetch(RAW_URL + "?t=" + Date.now());
+
+        if(!response.ok)
+            throw new Error(response.status + " " + response.statusText);
+
+        const text = await response.text();
+
+        content.className = "";
+        content.textContent = text;
+
+        status.textContent =
+            "Loaded • " +
+            new Date().toLocaleString();
+
+    }catch(e){
+
+        content.className = "error";
+        content.textContent =
+            "Unable to load raw.txt\n\n" +
+            e.message;
+
+        status.textContent = "Failed to load";
+
+    }
+
+}
+
+async function copyText(){
+
+    try{
+
+        await navigator.clipboard.writeText(
+            document.getElementById("content").textContent
+        );
+
+        alert("Copied!");
+
+    }catch(e){
+
+        alert("Copy failed.");
+
+    }
+
+}
+
+loadText();
+
+</script>
+
+</body>
+</html>
