@@ -12,7 +12,8 @@
 
     body {
         margin: 0;
-        min-height: 100vh;
+        min-height
+        : 100vh;
         font-family: Arial, Helvetica, sans-serif;
         background: #111;
         color: #eee;
@@ -336,7 +337,6 @@
 
 
 <script>
-
 const fileInput =
     document.getElementById("fileInput");
 
@@ -366,6 +366,9 @@ const canvas =
 
 
 let sourceImage = null;
+
+// Stores the original uploaded filename
+let originalFileName = "";
 
 
 // --------------------------------------------------
@@ -400,6 +403,11 @@ fileInput.addEventListener(
 
             return;
         }
+
+
+        // Save the original filename
+        originalFileName =
+            file.name;
 
 
         const reader =
@@ -772,25 +780,9 @@ function drawProcessedImage(
 
     if (sizeText) {
 
-        /*
-            --------------------------------------------------
-            BADGE SCALE
-            --------------------------------------------------
-
-            The entire badge scales from this value.
-
-            1.00 = normal
-            0.75 = smaller
-            1.25 = larger
-        */
-
         const badgeScale =
             0.8;
 
-
-        /*
-            Base pill height.
-        */
 
         const basePillHeight =
             Math.min(
@@ -799,35 +791,14 @@ function drawProcessedImage(
             ) * 0.11;
 
 
-        /*
-            Entire pill scales from
-            the same scale factor.
-        */
-
         const pillHeight =
             basePillHeight *
             badgeScale;
 
 
-        /*
-            The radius is exactly half
-            of the pill height.
-
-            This guarantees that both
-            ends are semicircles.
-        */
-
         const pillRadius =
             pillHeight / 2;
 
-
-        /*
-            Everything inside the pill
-            uses pillHeight.
-
-            Therefore the entire badge
-            remains proportional.
-        */
 
         const horizontalPadding =
             pillHeight * 0.32;
@@ -844,11 +815,6 @@ function drawProcessedImage(
         let fontSize =
             pillHeight * 0.35;
 
-
-        /*
-            Reduce font slightly when
-            the video-size text is long.
-        */
 
         if (sizeText.length > 10) {
 
@@ -920,15 +886,6 @@ function drawProcessedImage(
         // PILL BACKGROUND
         // ==================================================
 
-        /*
-            80% transparent means:
-
-            opacity = 20%
-
-            The background is transparent,
-            but the contents are NOT affected.
-        */
-
         targetCtx.globalAlpha =
             0.20;
 
@@ -956,12 +913,6 @@ function drawProcessedImage(
         // DOWNLOAD ICON
         // ==================================================
 
-        /*
-            Reset opacity.
-
-            The icon is now 100% opaque.
-        */
-
         targetCtx.globalAlpha =
             1.0;
 
@@ -985,10 +936,6 @@ function drawProcessedImage(
             "round";
 
 
-        /*
-            Center the icon vertically.
-        */
-
         const iconX =
             pillX +
             horizontalPadding;
@@ -998,12 +945,6 @@ function drawProcessedImage(
             pillY +
             (pillHeight - iconSize) / 2;
 
-
-        /*
-            SVG viewBox:
-
-            24 × 24
-        */
 
         const iconScale =
             iconSize / 24;
@@ -1124,10 +1065,6 @@ function drawProcessedImage(
         // VIDEO SIZE TEXT
         // ==================================================
 
-        /*
-            Text is also 100% opaque.
-        */
-
         targetCtx.globalAlpha =
             1.0;
 
@@ -1177,14 +1114,6 @@ function drawProcessedImage(
     // ==================================================
     // 5. BOTTOM-RIGHT 24-HOUR TIMESTAMP
     // ==================================================
-
-    /*
-        Creates a timestamp such as:
-
-        19:33
-
-        using the current local time.
-    */
 
     const now =
         new Date();
@@ -1459,6 +1388,17 @@ downloadBtn.addEventListener(
         downloadCanvas.toBlob(
             function (blob) {
 
+                if (!blob) {
+
+                    alert(
+                        "Failed to create the PNG."
+                    );
+
+                    return;
+
+                }
+
+
                 const url =
                     URL.createObjectURL(
                         blob
@@ -1475,8 +1415,17 @@ downloadBtn.addEventListener(
                     url;
 
 
+                // Remove the original extension
+                // and add "_vazewatermarked.png"
+                const baseName =
+                    originalFileName.replace(
+                        /\.[^/.]+$/,
+                        ""
+                    );
+
+
                 link.download =
-                    "blurred-play-watermark.png";
+                    `${baseName}_vazewatermarked.png`;
 
 
                 document.body.appendChild(
@@ -1504,7 +1453,6 @@ downloadBtn.addEventListener(
 
     }
 );
-
 </script>
 
 </body>
